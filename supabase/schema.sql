@@ -1,5 +1,6 @@
 create table if not exists public.donors (
   id uuid default gen_random_uuid() primary key,
+  donor_number text unique,
   name text not null,
   email text,
   phone text not null,
@@ -16,6 +17,7 @@ create table if not exists public.donors (
 
 alter table public.donors enable row level security;
 
+alter table public.donors add column if not exists donor_number text;
 alter table public.donors add column if not exists email text;
 alter table public.donors add column if not exists age integer;
 alter table public.donors add column if not exists gender text;

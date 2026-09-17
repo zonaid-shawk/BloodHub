@@ -4,6 +4,7 @@ import { supabase } from "./lib/supabase";
 const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 const initialForm = {
+  donor_number: "",
   name: "",
   email: "",
   phone: "",
@@ -28,7 +29,40 @@ const cities = [
   "Rangpur",
   "Cumilla",
   "Gazipur",
+  "Chattogram City",
+  "Cox's Bazar",
+  "Comilla (Cumilla)",
+  "Brahmanbaria",
+  "Chandpur",
+  "Feni",
+  "Noakhali",
+  "Lakshmipur",
+  "Rangamati",
+  "Bandarban",
+  "Khagrachhari",
 ];
+
+const getNextEligibleDate = (lastDonationDate) => {
+  if (!lastDonationDate) {
+    return new Date();
+  }
+
+  const date = new Date(lastDonationDate);
+  const nextDate = new Date(date);
+  nextDate.setDate(date.getDate() + 90);
+  return nextDate;
+};
+
+const isEligibleToDonate = (lastDonationDate) => {
+  if (!lastDonationDate) {
+    return true;
+  }
+
+  const lastDonation = new Date(lastDonationDate);
+  const diffDays =
+    (Date.now() - lastDonation.getTime()) / (1000 * 60 * 60 * 24);
+  return diffDays >= 90;
+};
 
 function App() {
   const [form, setForm] = useState(initialForm);
@@ -39,6 +73,36 @@ function App() {
 
   const handleFieldChange = (event) => {
     const { name, value, type, checked } = event.target;
+
+    if (name === "name") {
+      const sanitizedName = value.replace(/[^a-zA-Z\s.]/g, "");
+      setForm((prev) => ({
+        ...prev,
+        name: sanitizedName,
+      }));
+      return;
+    }
+
+    if (name === "donor_number") {
+      const sanitizedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+      const digitsAfterPrefix = sanitizedValue.replace(/^BD/, "").slice(0, 6);
+      const normalizedValue = digitsAfterPrefix ? `BD${digitsAfterPrefix}` : "";
+
+      setForm((prev) => ({
+        ...prev,
+        donor_number: normalizedValue,
+      }));
+      return;
+    }
+
+    if (name === "phone") {
+      const sanitizedPhone = value.replace(/\D/g, "").slice(0, 11);
+      setForm((prev) => ({
+        ...prev,
+        phone: sanitizedPhone,
+      }));
+      return;
+    }
 
     setForm((prev) => ({
       ...prev,
@@ -86,8 +150,51 @@ function App() {
       return;
     }
 
-    if (!form.name || !form.email || !form.phone || !form.blood_group || !form.age || !form.gender || !form.city || !form.confirmation) {
-      setMessage("Please fill all required fields and confirm the health statement.");
+    if (
+      !form.donor_number ||
+      !form.name ||
+      !form.email ||
+      !form.phone ||
+      !form.blood_group ||
+      !form.age ||
+      !form.gender ||
+      !form.city ||
+      !form.confirmation
+    ) {
+      setMessage(
+        "Please fill all required fields and confirm the health statement.",
+      );
+      return;
+    }
+
+    const donorNumberPattern = /^BD[A-Z0-9]{3,4}$/i;
+    if (!donorNumberPattern.test(form.donor_number)) {
+      setMessage(
+        "Donor number must start with BD and be 5 or 6 characters long.",
+      );
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(form.email)) {
+      setMessage("Please enter a valid email address.");
+      return;
+    }
+
+    if (!/^\d{11}$/.test(form.phone)) {
+      setMessage("Phone number must be exactly 11 digits.");
+      return;
+    }
+
+    if (
+      form.last_donation_date &&
+      !isEligibleToDonate(form.last_donation_date)
+    ) {
+      const nextEligible = getNextEligibleDate(form.last_donation_date);
+      const formattedDate = nextEligible.toLocaleDateString("en-CA");
+      setMessage(
+        `You are not eligible to donate yet. Next eligible date: ${formattedDate}`,
+      );
       return;
     }
 
@@ -96,6 +203,7 @@ function App() {
 
     const { error } = await supabase.from("donors").insert([
       {
+        donor_number: form.donor_number.toUpperCase(),
         name: form.name,
         email: form.email,
         phone: form.phone,
@@ -247,6 +355,20 @@ function App() {
               <form onSubmit={handleSubmit} className="mt-6 space-y-5">
                 <div className="space-y-5">
                   <label className="block text-[15px] font-semibold text-slate-700">
+                    Donor Number <span className="text-red-500">*</span>
+                    <input
+                      type="text"
+                      name="donor_number"
+                      value={form.donor_number}
+                      onChange={handleFieldChange}
+                      required
+                      maxLength={6}
+                      placeholder="BD123"
+                      className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base uppercase outline-none transition focus:border-red-400 focus:bg-white"
+                    />
+                  </label>
+
+                  <label className="block text-[15px] font-semibold text-slate-700">
                     Full Name <span className="text-red-500">*</span>
                     <input
                       type="text"
@@ -376,6 +498,10 @@ function App() {
                       className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base outline-none transition focus:border-red-400 focus:bg-white"
                     />
                   </label>
+                  <p className="text-sm text-slate-500">
+                    Eligibility rule: donors must wait at least 90 days after
+                    their last donation.
+                  </p>
 
                   <label className="flex items-center gap-3 text-base font-medium text-slate-700">
                     <input
@@ -494,7 +620,7 @@ function App() {
                         {donor.name}
                       </p>
                       <p className="mt-1 text-sm text-slate-500">
-                        {donor.district}
+                        {donor.city || "City not set"}
                       </p>
                     </div>
                     <span className="rounded-full bg-red-100 px-3 py-1 text-sm font-bold text-red-700">
@@ -511,7 +637,15 @@ function App() {
                       <span className="font-medium text-slate-700">
                         Status:
                       </span>{" "}
-                      {donor.availability}
+                      {donor.availability ? "Available" : "Unavailable"}
+                    </p>
+                    <p>
+                      <span className="font-medium text-slate-700">
+                        Eligibility:
+                      </span>{" "}
+                      {isEligibleToDonate(donor.last_donation_date)
+                        ? "Eligible now"
+                        : `Next eligible: ${getNextEligibleDate(donor.last_donation_date).toLocaleDateString("en-CA")}`}
                     </p>
                   </div>
                 </div>
