@@ -407,6 +407,46 @@ function App() {
           </div>
         </section>
       </main>
+
+      <footer className="mt-8 bg-[#021d2e] px-6 py-12 text-white">
+        <div className="mx-auto grid max-w-5xl gap-10 px-4 text-center md:grid-cols-2">
+          <div>
+            <p className="text-2xl font-bold text-[#f85a68]">Submitted by:</p>
+            <p className="mt-5 text-3xl font-black tracking-tight text-[#f85a68]">
+              MOHAMMAD ZONAID
+            </p>
+            <p className="mt-4 text-2xl font-semibold text-white">24150892010</p>
+            <p className="mt-4 text-2xl font-medium text-white">3rd Semester</p>
+            <p className="mt-4 text-2xl font-medium text-white">2023-2024</p>
+            <p className="mt-4 text-2xl font-medium text-white">Term 251</p>
+          </div>
+
+          <div className="flex flex-col items-center justify-center">
+            <p className="text-2xl font-bold text-[#f85a68]">Supervised by:</p>
+            <p className="mt-5 text-3xl font-black tracking-tight text-[#f85a68]">
+              SANTOSH KUMAR SHUSHIL
+            </p>
+            <p className="mt-4 text-2xl font-semibold text-white">
+              DEPARTMENT HEAD (CMT)
+            </p>
+
+            <div className="mt-8 flex items-center justify-center gap-3 text-2xl font-bold">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-sm bg-[#f5f5f5] text-[#0a7cff]">
+                D
+              </span>
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-sm bg-[#f5f5f5] text-[#0f0f0f]">
+                I
+              </span>
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-sm bg-[#f5f5f5] text-[#1fd655]">
+                T
+              </span>
+              <span className="text-3xl font-semibold text-white">
+                Dawfodil Institute of IT, Chattogram
+              </span>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
