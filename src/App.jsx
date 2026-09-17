@@ -5,11 +5,30 @@ const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 const initialForm = {
   name: "",
+  email: "",
   phone: "",
-  blood_group: "O+",
-  district: "",
-  availability: "Available",
+  blood_group: "",
+  age: "",
+  gender: "",
+  city: "",
+  address: "",
+  last_donation_date: "",
+  availability: true,
+  confirmation: false,
 };
+
+const cities = [
+  "Dhaka",
+  "Chattogram",
+  "Khulna",
+  "Rajshahi",
+  "Sylhet",
+  "Barishal",
+  "Mymensingh",
+  "Rangpur",
+  "Cumilla",
+  "Gazipur",
+];
 
 function App() {
   const [form, setForm] = useState(initialForm);
@@ -17,6 +36,15 @@ function App() {
   const [filter, setFilter] = useState("All");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+
+  const handleFieldChange = (event) => {
+    const { name, value, type, checked } = event.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
 
   const filteredDonors = useMemo(() => {
     if (filter === "All") return donors;
@@ -48,11 +76,6 @@ function App() {
     fetchDonors();
   }, []);
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -63,16 +86,27 @@ function App() {
       return;
     }
 
+    if (!form.name || !form.email || !form.phone || !form.blood_group || !form.age || !form.gender || !form.city || !form.confirmation) {
+      setMessage("Please fill all required fields and confirm the health statement.");
+      return;
+    }
+
     setIsSubmitting(true);
     setMessage("");
 
     const { error } = await supabase.from("donors").insert([
       {
         name: form.name,
+        email: form.email,
         phone: form.phone,
         blood_group: form.blood_group,
-        district: form.district,
+        age: Number(form.age),
+        gender: form.gender,
+        city: form.city,
+        address: form.address || null,
+        last_donation_date: form.last_donation_date || null,
         availability: form.availability,
+        confirmation: form.confirmation,
       },
     ]);
 
@@ -211,43 +245,56 @@ function App() {
               </h2>
 
               <form onSubmit={handleSubmit} className="mt-6 space-y-5">
-                <div className="grid gap-5 md:grid-cols-2">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Full Name
+                <div className="space-y-5">
+                  <label className="block text-[15px] font-semibold text-slate-700">
+                    Full Name <span className="text-red-500">*</span>
                     <input
                       type="text"
                       name="name"
                       value={form.name}
-                      onChange={handleChange}
+                      onChange={handleFieldChange}
                       required
-                      placeholder="Your name"
-                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-red-400 focus:bg-white"
+                      placeholder="Enter your full name"
+                      className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base outline-none transition focus:border-red-400 focus:bg-white"
                     />
                   </label>
 
-                  <label className="block text-sm font-medium text-slate-700">
-                    Phone Number
+                  <label className="block text-[15px] font-semibold text-slate-700">
+                    Email <span className="text-red-500">*</span>
+                    <input
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleFieldChange}
+                      required
+                      placeholder="your@email.com"
+                      className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base outline-none transition focus:border-red-400 focus:bg-white"
+                    />
+                  </label>
+
+                  <label className="block text-[15px] font-semibold text-slate-700">
+                    Phone Number <span className="text-red-500">*</span>
                     <input
                       type="tel"
                       name="phone"
                       value={form.phone}
-                      onChange={handleChange}
+                      onChange={handleFieldChange}
                       required
-                      placeholder="01XXXXXXXXX"
-                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-red-400 focus:bg-white"
+                      placeholder="017XXXXXXXX"
+                      className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base outline-none transition focus:border-red-400 focus:bg-white"
                     />
                   </label>
-                </div>
 
-                <div className="grid gap-5 md:grid-cols-2">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Blood Group
+                  <label className="block text-[15px] font-semibold text-slate-700">
+                    Blood Group <span className="text-red-500">*</span>
                     <select
                       name="blood_group"
                       value={form.blood_group}
-                      onChange={handleChange}
-                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-red-400 focus:bg-white"
+                      onChange={handleFieldChange}
+                      required
+                      className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base outline-none transition focus:border-red-400 focus:bg-white"
                     >
+                      <option value="">Select Blood Group</option>
                       {bloodGroups.map((group) => (
                         <option key={group} value={group}>
                           {group}
@@ -256,37 +303,107 @@ function App() {
                     </select>
                   </label>
 
-                  <label className="block text-sm font-medium text-slate-700">
-                    District
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <label className="block text-[15px] font-semibold text-slate-700">
+                      Age <span className="text-red-500">*</span>
+                      <input
+                        type="number"
+                        name="age"
+                        min="18"
+                        max="65"
+                        value={form.age}
+                        onChange={handleFieldChange}
+                        required
+                        placeholder="18-65 years"
+                        className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base outline-none transition focus:border-red-400 focus:bg-white"
+                      />
+                    </label>
+
+                    <label className="block text-[15px] font-semibold text-slate-700">
+                      Gender <span className="text-red-500">*</span>
+                      <select
+                        name="gender"
+                        value={form.gender}
+                        onChange={handleFieldChange}
+                        required
+                        className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base outline-none transition focus:border-red-400 focus:bg-white"
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <label className="block text-[15px] font-semibold text-slate-700">
+                    City <span className="text-red-500">*</span>
+                    <select
+                      name="city"
+                      value={form.city}
+                      onChange={handleFieldChange}
+                      required
+                      className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base outline-none transition focus:border-red-400 focus:bg-white"
+                    >
+                      <option value="">Select City</option>
+                      {cities.map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="block text-[15px] font-semibold text-slate-700">
+                    Address
                     <input
                       type="text"
-                      name="district"
-                      value={form.district}
-                      onChange={handleChange}
-                      required
-                      placeholder="Your district"
-                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-red-400 focus:bg-white"
+                      name="address"
+                      value={form.address}
+                      onChange={handleFieldChange}
+                      placeholder="Your full address"
+                      className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base outline-none transition focus:border-red-400 focus:bg-white"
                     />
                   </label>
-                </div>
 
-                <label className="block text-sm font-medium text-slate-700">
-                  Availability
-                  <select
-                    name="availability"
-                    value={form.availability}
-                    onChange={handleChange}
-                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-red-400 focus:bg-white"
-                  >
-                    <option value="Available">Available</option>
-                    <option value="Unavailable">Unavailable</option>
-                  </select>
-                </label>
+                  <label className="block text-[15px] font-semibold text-slate-700">
+                    Last Donation Date
+                    <input
+                      type="date"
+                      name="last_donation_date"
+                      value={form.last_donation_date}
+                      onChange={handleFieldChange}
+                      className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base outline-none transition focus:border-red-400 focus:bg-white"
+                    />
+                  </label>
+
+                  <label className="flex items-center gap-3 text-base font-medium text-slate-700">
+                    <input
+                      type="checkbox"
+                      name="availability"
+                      checked={form.availability}
+                      onChange={handleFieldChange}
+                      className="h-5 w-5 accent-red-600"
+                    />
+                    I am available for blood donation
+                  </label>
+
+                  <label className="flex items-center gap-3 text-base font-medium text-slate-700">
+                    <input
+                      type="checkbox"
+                      name="confirmation"
+                      checked={form.confirmation}
+                      onChange={handleFieldChange}
+                      className="h-5 w-5 accent-red-600"
+                    />
+                    I confirm that I am healthy and eligible to donate blood
+                  </label>
+                </div>
 
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full rounded-2xl bg-red-600 px-5 py-3 font-semibold text-white transition hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-red-300"
+                  className="w-full rounded-2xl bg-gradient-to-r from-[#e96b4b] to-[#d44f4b] px-5 py-4 text-xl font-black text-white shadow-lg transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {isSubmitting ? "Registering..." : "Register as Donor"}
                 </button>
