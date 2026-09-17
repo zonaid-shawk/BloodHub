@@ -430,18 +430,14 @@ function App() {
               DEPARTMENT HEAD (CMT)
             </p>
 
-            <div className="mt-8 flex items-center justify-center gap-3 text-2xl font-bold">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-sm bg-[#f5f5f5] text-[#0a7cff]">
-                D
-              </span>
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-sm bg-[#f5f5f5] text-[#0f0f0f]">
-                I
-              </span>
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-sm bg-[#f5f5f5] text-[#1fd655]">
-                T
-              </span>
+            <div className="mt-8 flex items-center justify-center gap-4 text-2xl font-bold">
+              <img
+                src="/diit logo.jpg"
+                alt="Daffodil Institute of IT logo"
+                className="h-12 w-12 rounded-md object-cover shadow-sm"
+              />
               <span className="text-3xl font-semibold text-white">
-                Dawfodil Institute of IT, Chattogram
+                Daffodil Institute of IT, Chattogram
               </span>
             </div>
           </div>
