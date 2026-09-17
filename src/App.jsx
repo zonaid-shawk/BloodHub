@@ -408,35 +408,35 @@ function App() {
         </section>
       </main>
 
-      <footer className="mt-8 bg-[#021d2e] px-6 py-12 text-white">
-        <div className="mx-auto grid max-w-5xl gap-10 px-4 text-center md:grid-cols-2">
+      <footer className="mt-8 bg-[#021d2e] px-6 py-10 text-white">
+        <div className="mx-auto grid max-w-5xl gap-8 px-4 text-center md:grid-cols-2">
           <div>
-            <p className="text-2xl font-bold text-[#f85a68]">Submitted by:</p>
-            <p className="mt-5 text-3xl font-black tracking-tight text-[#f85a68]">
+            <p className="text-xl font-bold text-[#f85a68]">Submitted by:</p>
+            <p className="mt-4 text-2xl font-black tracking-tight text-[#f85a68]">
               MOHAMMAD ZONAID
             </p>
-            <p className="mt-4 text-2xl font-semibold text-white">24150892010</p>
-            <p className="mt-4 text-2xl font-medium text-white">3rd Semester</p>
-            <p className="mt-4 text-2xl font-medium text-white">2023-2024</p>
-            <p className="mt-4 text-2xl font-medium text-white">Term 251</p>
+            <p className="mt-3 text-lg font-semibold text-white">24150892010</p>
+            <p className="mt-3 text-lg font-medium text-white">3rd Semester</p>
+            <p className="mt-3 text-lg font-medium text-white">2023-2024</p>
+            <p className="mt-3 text-lg font-medium text-white">Term 251</p>
           </div>
 
           <div className="flex flex-col items-center justify-center">
-            <p className="text-2xl font-bold text-[#f85a68]">Supervised by:</p>
-            <p className="mt-5 text-3xl font-black tracking-tight text-[#f85a68]">
+            <p className="text-xl font-bold text-[#f85a68]">Supervised by:</p>
+            <p className="mt-4 text-2xl font-black tracking-tight text-[#f85a68]">
               SANTOSH KUMAR SHUSHIL
             </p>
-            <p className="mt-4 text-2xl font-semibold text-white">
+            <p className="mt-3 text-lg font-semibold text-white">
               DEPARTMENT HEAD (CMT)
             </p>
 
-            <div className="mt-8 flex items-center justify-center gap-4 text-2xl font-bold">
+            <div className="mt-6 flex items-center justify-center gap-3 text-lg font-bold">
               <img
                 src="/diit logo.jpg"
                 alt="Daffodil Institute of IT logo"
-                className="h-12 w-12 rounded-md object-cover shadow-sm"
+                className="h-10 w-10 rounded-md object-cover shadow-sm"
               />
-              <span className="text-3xl font-semibold text-white">
+              <span className="text-xl font-semibold text-white">
                 Daffodil Institute of IT, Chattogram
               </span>
             </div>
