@@ -21,20 +21,6 @@ export default function RegisterSection({
           <form onSubmit={handleSubmit} className="mt-6 space-y-5">
             <div className="space-y-5">
               <label className="block text-[15px] font-semibold text-slate-700">
-                Donor Number <span className="text-red-500">*</span>
-                <input
-                  type="text"
-                  name="donor_number"
-                  value={form.donor_number}
-                  onChange={handleFieldChange}
-                  required
-                  maxLength={6}
-                  placeholder="BD123"
-                  className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base uppercase outline-none transition focus:border-red-400 focus:bg-white"
-                />
-              </label>
-
-              <label className="block text-[15px] font-semibold text-slate-700">
                 Full Name <span className="text-red-500">*</span>
                 <input
                   type="text"
@@ -218,23 +204,57 @@ export default function RegisterSection({
 
           <div className="mt-8 space-y-4 text-slate-200">
             <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4">
-              <p className="font-semibold text-white">Safe and easy</p>
+              <p className="font-semibold text-white">Saves Lives</p>
               <p className="mt-1 text-sm">
-                The donation process is quick, safe, and medically supervised.
+                Human blood cannot be manufactured, and a single donation can
+                save up to{" "}
+                <span className="font-semibold text-white">three lives</span>.
               </p>
             </div>
             <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4">
-              <p className="font-semibold text-white">Community impact</p>
+              <p className="font-semibold text-white">Supports Trauma Care</p>
               <p className="mt-1 text-sm">
-                Every donor strengthens local emergency response and hospital
-                care.
+                Provides critical, immediate lifelines for accident and disaster
+                victims experiencing severe blood loss.
               </p>
             </div>
             <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4">
-              <p className="font-semibold text-white">Repeat support</p>
+              <p className="font-semibold text-white">Aids Chronic Illnesses</p>
               <p className="mt-1 text-sm">
-                Regular donations help maintain a stable blood supply for
-                patients in need.
+                Supplies essential platelets and red blood cells for cancer
+                patients undergoing chemotherapy.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4">
+              <p className="font-semibold text-white">Enables Safe Surgeries</p>
+              <p className="mt-1 text-sm">
+                Ensures a stable backup supply for major operations and
+                unexpected childbirth complications.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4">
+              <p className="font-semibold text-white">
+                Includes Free Health Checks
+              </p>
+              <p className="mt-1 text-sm">
+                Offers donors a mini physical that tracks blood pressure, pulse,
+                temperature, and hemoglobin levels.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4">
+              <p className="font-semibold text-white">Manages Iron Levels</p>
+              <p className="mt-1 text-sm">
+                Reduces harmful iron stores in the blood, which can lower the
+                risk of heart disease for regular donors.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4">
+              <p className="font-semibold text-white">
+                Boosts Community Well-being
+              </p>
+              <p className="mt-1 text-sm">
+                Delivers a powerful sense of purpose and fulfillment by directly
+                serving neighbors in need.
               </p>
             </div>
           </div>
