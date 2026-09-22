@@ -37,7 +37,7 @@ export default function Footer() {
 
             <div className="mt-5 flex items-center gap-3 rounded-2xl bg-slate-900/40 p-3">
               <img
-                src="/diit logo.jpg"
+                src="/Diit_logo.png"
                 alt="Daffodil Institute of IT logo"
                 className="h-12 w-12 rounded-xl object-cover shadow-sm"
               />
