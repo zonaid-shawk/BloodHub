@@ -39,7 +39,7 @@ export default function Footer() {
               <img
                 src="/Diit_logo.png"
                 alt="Daffodil Institute of IT logo"
-                className="h-12 w-12 rounded-xl object-cover shadow-sm"
+                className="h-8 w-300 object-cover shadow-sm"
               />
               <span className="text-sm font-medium text-slate-100 md:text-base">
                 Daffodil Institute of IT, Chattogram
