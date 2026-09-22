@@ -1,139 +1,138 @@
-export default function DonorListSection({
-  filteredDonors,
-  filter,
-  setFilter,
-  bloodGroups,
-  getNextEligibleDate,
-  isEligibleToDonate,
-  searchDonorId,
-  setSearchDonorId,
-  donorSearchResult,
-  onSearchDonor,
-}) {
+import { useEffect, useState, useMemo } from "react";
+import { supabase } from "../lib/supabaseClient";
+import DonorCard from "./DonorCard";
+import SearchFilter from "./SearchFilter";
+
+export default function DonorListSection() {
+  const [donors, setDonors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({
+    bloodGroup: "",
+    location: "",
+    availability: "",
+  });
+
+  useEffect(() => {
+    fetchDonors();
+  }, []);
+
+  const fetchDonors = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("donors")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setDonors(data || []);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load donors. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredDonors = useMemo(() => {
+    return donors.filter((donor) => {
+      if (filters.bloodGroup && donor.blood_group !== filters.bloodGroup)
+        return false;
+      if (
+        filters.location &&
+        !donor.location?.toLowerCase().includes(filters.location.toLowerCase())
+      )
+        return false;
+      if (filters.availability === "available") {
+        const isEligible = checkEligibility(donor.last_donation_date);
+        if (!isEligible) return false;
+      }
+      return true;
+    });
+  }, [donors, filters]);
+
+  const handleReset = () => {
+    setFilters({ bloodGroup: "", location: "", availability: "" });
+  };
+
   return (
-    <section id="donors" className="mx-auto max-w-7xl px-6 py-12">
-      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-500">
-            Donors
-          </p>
-          <h2 className="mt-3 text-3xl font-black text-slate-900">
-            Available blood donors
+    <section id="donors" className="py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            Available Blood Donors
           </h2>
-        </div>
-
-        <div className="flex w-full max-w-md items-center gap-2">
-          <input
-            type="text"
-            value={searchDonorId}
-            onChange={(event) => setSearchDonorId(event.target.value)}
-            placeholder="Search donor ID"
-            className="w-full rounded-full border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-red-400"
-          />
-          <button
-            type="button"
-            onClick={onSearchDonor}
-            className="rounded-full bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
-          >
-            Search
-          </button>
-        </div>
-      </div>
-
-      {donorSearchResult && (
-        <div className="mb-6 rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-soft">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
-            Matched donor
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Find a matching donor near you. Filter by blood group and location.
           </p>
-          <div className="mt-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xl font-black text-slate-900">
-                {donorSearchResult.name}
-              </p>
-              <p className="text-sm text-slate-600">
-                {donorSearchResult.donor_number || donorSearchResult.id} •{" "}
-                {donorSearchResult.blood_group} • {donorSearchResult.city}
-              </p>
-            </div>
-            <div className="text-sm text-slate-700">
-              <p>Phone: {donorSearchResult.phone}</p>
-              <p>Email: {donorSearchResult.email || "Not provided"}</p>
-            </div>
-          </div>
         </div>
-      )}
 
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setFilter("All")}
-          className={`rounded-full px-4 py-2 text-sm font-semibold ${filter === "All" ? "bg-red-600 text-white" : "bg-white text-slate-700 shadow-sm"}`}
-        >
-          All
-        </button>
-        {bloodGroups.map((group) => (
-          <button
-            key={group}
-            onClick={() => setFilter(group)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${filter === group ? "bg-red-600 text-white" : "bg-white text-slate-700 shadow-sm"}`}
-          >
-            {group}
-          </button>
-        ))}
-      </div>
+        <div className="mb-8">
+          <SearchFilter
+            filters={filters}
+            setFilters={setFilters}
+            onReset={handleReset}
+          />
+        </div>
 
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {filteredDonors.length > 0 ? (
-          filteredDonors.map((donor) => (
-            <div
-              key={donor.id}
-              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">
-                    {donor.donor_number || "Auto ID"}
-                  </p>
-                  <p className="mt-2 text-xl font-bold text-slate-900">
-                    {donor.name}
-                  </p>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {donor.city || "City not set"}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className="rounded-full bg-red-100 px-3 py-1 text-sm font-bold text-red-700">
-                    {donor.blood_group}
-                  </span>
-                  <div
-                    className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${donor.availability ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-700"}`}
-                  >
-                    {donor.availability ? "Available" : "Unavailable"}
-                  </div>
-                </div>
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse"
+              >
+                <div className="w-14 h-14 bg-gray-200 rounded-xl mb-4" />
+                <div className="h-5 bg-gray-200 rounded w-3/4 mb-3" />
+                <div className="h-4 bg-gray-200 rounded w-1/2 mb-2" />
+                <div className="h-4 bg-gray-200 rounded w-2/3 mb-4" />
+                <div className="h-10 bg-gray-200 rounded-xl" />
               </div>
-
-              <div className="mt-5 space-y-3 rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
-                <p>
-                  <span className="font-medium text-slate-700">Phone:</span>{" "}
-                  {donor.phone}
-                </p>
-                <p>
-                  <span className="font-medium text-slate-700">
-                    Eligibility:
-                  </span>{" "}
-                  {isEligibleToDonate(donor.last_donation_date)
-                    ? "Eligible now"
-                    : `Next eligible: ${getNextEligibleDate(donor.last_donation_date).toLocaleDateString("en-CA")}`}
-                </p>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500 md:col-span-2 xl:col-span-3">
-            No donors available yet. Be the first to register.
+            ))}
           </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-center">
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && filteredDonors.length === 0 && (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">🩸</div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              No donors found
+            </h3>
+            <p className="text-gray-500">
+              Try adjusting your filters or check back later.
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && filteredDonors.length > 0 && (
+          <>
+            <p className="text-sm text-gray-500 mb-4">
+              Showing {filteredDonors.length} donor
+              {filteredDonors.length !== 1 ? "s" : ""}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredDonors.map((donor) => (
+                <DonorCard key={donor.id} donor={donor} />
+              ))}
+            </div>
+          </>
         )}
       </div>
     </section>
   );
+}
+
+function checkEligibility(lastDonationDate) {
+  if (!lastDonationDate) return true;
+  const last = new Date(lastDonationDate);
+  const now = new Date();
+  const diffDays = (now - last) / (1000 * 60 * 60 * 24);
+  return diffDays >= 90;
 }
